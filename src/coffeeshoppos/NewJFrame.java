@@ -71,8 +71,8 @@ public class NewJFrame extends javax.swing.JFrame {
     public void addtable(int id ,String Name, int Qty ,Double Price) {
         DefaultTableModel dt = (DefaultTableModel) jTable3.getModel();
         
-        DecimalFormat df = new DecimalFormat("#.00") ;   
-        double totPrice = Price * Double.valueOf(Qty) ;
+        DecimalFormat df = new DecimalFormat("#.00");   
+        double totPrice = Price * Double.valueOf(Qty);
         String TotalPrice = df.format(totPrice);
         
         for (int row =0; row < jTable3.getRowCount(); row++) {
@@ -342,7 +342,7 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(q7, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jButton8))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         jPanel5.setBackground(new java.awt.Color(236, 224, 209));
@@ -435,6 +435,11 @@ public class NewJFrame extends javax.swing.JFrame {
         jButton10.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
         jButton10.setText("PAY");
         jButton10.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
 
         jButton11.setBackground(new java.awt.Color(150, 114, 89));
         jButton11.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
@@ -548,8 +553,47 @@ public class NewJFrame extends javax.swing.JFrame {
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
         DefaultTableModel dt = (DefaultTableModel) jTable3.getModel();
+        
+        String r = dt.getValueAt(jTable3.getSelectedRow(), 0).toString();
+        
+        //remove product
         int rw = jTable3.getSelectedRow();
         dt.removeRow(rw);
+        
+        //remove Qty lable
+        System.out.println(r);
+        switch (r) {
+            case "1":
+                q1.setText("0");
+                break;
+            case "2":
+                q2.setText("0");
+                break;
+            case "3":
+                q3.setText("0");
+                break;
+            case "4":
+                q4.setText("0");
+                break; 
+            case "5":
+                q5.setText("0");
+                break;
+            case "6":
+                q6.setText("0");
+                break;
+            case "7":
+                q7.setText("0");
+                break;  
+            case "8":
+                q8.setText("0");
+                break;
+            case "9":
+                q9.setText("0");
+                break;
+                
+            default:
+                System.out.println("Over");
+        }
     }//GEN-LAST:event_deleteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -637,6 +681,10 @@ public class NewJFrame extends javax.swing.JFrame {
         addtable(9, "Mocha", i, 189.50);     
         cal();
     }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton10ActionPerformed
 
   
     /**
