@@ -407,9 +407,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="edit2" min="-2" pref="164" max="-2" attributes="0"/>
+                              <Component id="edit" min="-2" pref="164" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="edit3" max="32767" attributes="0"/>
+                              <Component id="delete" max="32767" attributes="0"/>
                           </Group>
                           <Component id="jScrollPane5" min="-2" pref="330" max="-2" attributes="0"/>
                       </Group>
@@ -427,8 +427,8 @@
                               <Component id="jScrollPane5" pref="471" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="edit2" pref="53" max="32767" attributes="0"/>
-                                  <Component id="edit3" max="32767" attributes="0"/>
+                                  <Component id="edit" pref="53" max="32767" attributes="0"/>
+                                  <Component id="delete" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -472,7 +472,7 @@
                 </Property>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="edit2">
+            <Component class="javax.swing.JButton" name="edit">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="59" green="72" red="96" type="rgb"/>
@@ -488,10 +488,10 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edit2ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editActionPerformed"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="edit3">
+            <Component class="javax.swing.JButton" name="delete">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="59" green="72" red="96" type="rgb"/>
@@ -507,7 +507,7 @@
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edit3ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

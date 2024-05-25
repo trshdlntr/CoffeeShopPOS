@@ -139,8 +139,8 @@ public class NewJFrame extends javax.swing.JFrame {
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
         jTextField1 = new javax.swing.JTextField();
-        edit2 = new javax.swing.JButton();
-        edit3 = new javax.swing.JButton();
+        edit = new javax.swing.JButton();
+        delete = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
@@ -361,23 +361,23 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jTextField1.setBackground(new java.awt.Color(219, 193, 172));
 
-        edit2.setBackground(new java.awt.Color(150, 114, 89));
-        edit2.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        edit2.setText("EDIT");
-        edit2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        edit2.addActionListener(new java.awt.event.ActionListener() {
+        edit.setBackground(new java.awt.Color(150, 114, 89));
+        edit.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        edit.setText("EDIT");
+        edit.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        edit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edit2ActionPerformed(evt);
+                editActionPerformed(evt);
             }
         });
 
-        edit3.setBackground(new java.awt.Color(150, 114, 89));
-        edit3.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        edit3.setText("DELETE");
-        edit3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        edit3.addActionListener(new java.awt.event.ActionListener() {
+        delete.setBackground(new java.awt.Color(150, 114, 89));
+        delete.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        delete.setText("DELETE");
+        delete.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edit3ActionPerformed(evt);
+                deleteActionPerformed(evt);
             }
         });
 
@@ -391,9 +391,9 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(edit2, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(edit3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(delete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -407,8 +407,8 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(edit2, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
-                            .addComponent(edit3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(edit, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                            .addComponent(delete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -542,13 +542,15 @@ public class NewJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void edit2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit2ActionPerformed
+    private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_edit2ActionPerformed
+    }//GEN-LAST:event_editActionPerformed
 
-    private void edit3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_edit3ActionPerformed
+    private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
+        DefaultTableModel dt = (DefaultTableModel) jTable3.getModel();
+        int rw = jTable3.getSelectedRow();
+        dt.removeRow(rw);
+    }//GEN-LAST:event_deleteActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // BTN CODE
@@ -672,8 +674,8 @@ public class NewJFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton edit2;
-    private javax.swing.JButton edit3;
+    private javax.swing.JButton delete;
+    private javax.swing.JButton edit;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
