@@ -1,7 +1,6 @@
 package coffeeshoppos;
 
-import static com.mysql.cj.telemetry.TelemetryAttribute.DB_USER;
-import java.security.Timestamp;
+import java.awt.print.PrinterException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,6 +13,15 @@ import javax.swing.table.DefaultTableModel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.sql.PreparedStatement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.sql.Timestamp;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JFrame;
+import javax.swing.RowFilter;
+import javax.swing.table.TableRowSorter;
+
 
 /**
  *
@@ -41,7 +49,7 @@ public class NewJFrame extends javax.swing.JFrame {
         pstmt = conn.prepareStatement(sql);
 
         // Set the parameters
-        pstmt.setDate(1, new java.sql.Date(orderDate.getTime()));
+        pstmt.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime())); // Use Timestamp to store both date and time
         pstmt.setDouble(2, totalAmount);
 
         // Execute the insert statement
@@ -67,6 +75,26 @@ public class NewJFrame extends javax.swing.JFrame {
     }
 }
     
+    private void loadOrderData() {
+    DefaultTableModel model = (DefaultTableModel) crudtable.getModel();
+    model.setRowCount(0); // Clear existing data
+
+    String sql = "SELECT order_id, order_date, total_amount FROM orders";
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*");
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+        
+        while (rs.next()) {
+            int orderId = rs.getInt("order_id");
+            Timestamp orderDate = rs.getTimestamp("order_date");
+            double totalAmount = rs.getDouble("total_amount");
+            model.addRow(new Object[]{orderId, orderDate, totalAmount});
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error loading data", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
     
     
     public NewJFrame() {
@@ -74,7 +102,33 @@ public class NewJFrame extends javax.swing.JFrame {
         testDatabaseConnection(); // Test the database connection upon initialization
         jTable3.getColumnModel().getColumn(0).setPreferredWidth(30);
         jTable3.getColumnModel().getColumn(1).setPreferredWidth(180);
+        
+        // Attach action listeners for buttons
+    addcrud.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        addcrudActionPerformed(evt);
+    }
+});
 
+    editcrud.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        editcrudActionPerformed(evt);
+    }
+});
+
+    deletecrud.addActionListener(new java.awt.event.ActionListener() {
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        deletecrudActionPerformed(evt);
+    }
+});
+    searchbutton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String searchText = searchbar.getText().trim();
+        searchInDatabase(searchText);
+    }
+});
+          
     }
     
     // Method to establish a connection to the database
@@ -114,26 +168,6 @@ public class NewJFrame extends javax.swing.JFrame {
         }
     }
     
-    public class DatabaseManager {
-    private Connection connection;
-    
-    // Constructor
-    public DatabaseManager() {
-        // Initialize connection
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    // Method to retrieve orders from the database
-    public ResultSet getOrders() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM orders");
-        return statement.executeQuery();
-    }
-}
-    
     private int orderNumber = 1;
     
     public void addtable(int id ,String Name, int Qty ,Double Price) {
@@ -158,30 +192,6 @@ public class NewJFrame extends javax.swing.JFrame {
    
         dt.addRow(v);
     }
-    private void fillOrdersTable() {
-        
-    try {
-        DatabaseManager dbManager = new DatabaseManager();
-        ResultSet resultSet = dbManager.getOrders();
-        DefaultTableModel model = (DefaultTableModel) transactiontable.getModel();
-        
-        // Clear existing rows
-        model.setRowCount(0);
-        
-        // Iterate through the ResultSet and add rows to the table
-        while (resultSet.next()) {
-            int orderID = resultSet.getInt("order_id");
-            String orderDate = resultSet.getString("order_date");
-            double totalAmount = resultSet.getDouble("total_amount");
-            model.addRow(new Object[]{orderID, orderDate, totalAmount});
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error fetching orders from the database", "Database Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
-}
-
- 
     
     public void cal() {
         //cal total table values
@@ -235,8 +245,14 @@ public class NewJFrame extends javax.swing.JFrame {
         bill = new javax.swing.JTextArea();
         addbutton = new javax.swing.JButton();
         updatebutton = new javax.swing.JButton();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        transactiontable = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        crudtable = new javax.swing.JTable();
+        addcrud = new javax.swing.JButton();
+        deletecrud = new javax.swing.JButton();
+        editcrud = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        searchbar = new javax.swing.JTextField();
+        searchbutton = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
@@ -244,7 +260,7 @@ public class NewJFrame extends javax.swing.JFrame {
         pay = new javax.swing.JTextField();
         total = new javax.swing.JLabel();
         bal = new javax.swing.JLabel();
-        jButton10 = new javax.swing.JButton();
+        paybutton = new javax.swing.JButton();
         print = new javax.swing.JButton();
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -498,9 +514,7 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
 
-        transactiontable.setBackground(new java.awt.Color(219, 193, 172));
-        transactiontable.setForeground(new java.awt.Color(99, 72, 50));
-        transactiontable.setModel(new javax.swing.table.DefaultTableModel(
+        crudtable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -508,16 +522,48 @@ public class NewJFrame extends javax.swing.JFrame {
 
             }
         ));
-        transactiontable.addAncestorListener(new javax.swing.event.AncestorListener() {
-            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
-                transactiontableAncestorAdded(evt);
-            }
-            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
-            }
-            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+        jScrollPane2.setViewportView(crudtable);
+
+        addcrud.setBackground(new java.awt.Color(150, 114, 89));
+        addcrud.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        addcrud.setText("ADD");
+        addcrud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addcrudActionPerformed(evt);
             }
         });
-        jScrollPane6.setViewportView(transactiontable);
+
+        deletecrud.setBackground(new java.awt.Color(150, 114, 89));
+        deletecrud.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        deletecrud.setText("DELETE");
+        deletecrud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletecrudActionPerformed(evt);
+            }
+        });
+
+        editcrud.setBackground(new java.awt.Color(150, 114, 89));
+        editcrud.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        editcrud.setText("EDIT");
+        editcrud.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editcrudActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel1.setText("Search Order ID:");
+
+        searchbar.setText("jTextField1");
+
+        searchbutton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/coffeepics/search.png"))); // NOI18N
+        searchbutton.setText("EDIT");
+        searchbutton.setBorder(null);
+        searchbutton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchbuttonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -527,16 +573,28 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                            .addComponent(addbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(updatebutton, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(deletebutton, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(addcrud, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(editcrud, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deletecrud, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(addbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(updatebutton, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deletebutton, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchbar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(searchbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -545,16 +603,26 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(searchbar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(searchbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(addcrud, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(editcrud, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(deletecrud, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(addbutton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(updatebutton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(updatebutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+                            .addComponent(addbutton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(deletebutton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
 
@@ -575,13 +643,13 @@ public class NewJFrame extends javax.swing.JFrame {
 
         bal.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
 
-        jButton10.setBackground(new java.awt.Color(150, 114, 89));
-        jButton10.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        jButton10.setText("PAY");
-        jButton10.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
+        paybutton.setBackground(new java.awt.Color(150, 114, 89));
+        paybutton.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        paybutton.setText("PAY");
+        paybutton.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        paybutton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
+                paybuttonActionPerformed(evt);
             }
         });
 
@@ -611,7 +679,7 @@ public class NewJFrame extends javax.swing.JFrame {
                     .addComponent(total, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pay, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(103, 103, 103)
-                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(paybutton, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(44, 44, 44)
                 .addComponent(print, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(54, 54, 54))
@@ -636,7 +704,7 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addGap(40, 40, 40))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(paybutton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(print, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(34, 34, 34))))
         );
@@ -753,39 +821,11 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void printActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printActionPerformed
-        // Bill printing
-        
         try {
-            bill.setText("\n\t      Trisha's Coffee Shop \n");
-            bill.setText(bill.getText()+"\t          Commonwealth\n");
-            bill.setText(bill.getText()+"\t          Building 24 MRB\n");
-            bill.setText(bill.getText()+"\t          Commonwealth\n\n");
-            bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
-            bill.setText(bill.getText()+"Items:                                        Qty:                      Price:             \n");
-            bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
-            
-        DefaultTableModel df = (DefaultTableModel) jTable3.getModel();
-        
-        //get table product details
-        for (int i = 0; i < jTable3.getRowCount(); i++) {
-            String Name = df.getValueAt(i, 1).toString();
-            String Qty = df.getValueAt(i, 2).toString();
-            String Price = df.getValueAt(i, 3).toString();
-            
-            bill.setText(bill.getText() + Name+"\t\t"+ Qty+"\t"+ Price +"\n");
+            bill.print();
+        } catch (PrinterException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        // Display payment details
-        bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
-        bill.setText(bill.getText() + "Payment Details:\n");
-        bill.setText(bill.getText() + "Cash: ₱" + pay.getText() + "\n");
-        bill.setText(bill.getText() + "Total: ₱" + total.getText() + "\n");
-        bill.setText(bill.getText() + "Change: ₱" + bal.getText() + "\n");
-        bill.setText(bill.getText() + "Date: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n");
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error printing bill", "Print Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();  
-        }          
     }//GEN-LAST:event_printActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -860,7 +900,7 @@ public class NewJFrame extends javax.swing.JFrame {
         cal();
     }//GEN-LAST:event_jButton9ActionPerformed
 
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+    private void paybuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paybuttonActionPerformed
         try {
             double tot = Double.valueOf(total.getText());
             double paid = Double.valueOf(pay.getText());
@@ -876,8 +916,47 @@ public class NewJFrame extends javax.swing.JFrame {
 
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Please enter valid numbers for total and payment", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-        }        
-    }//GEN-LAST:event_jButton10ActionPerformed
+        }
+        
+        // Bill printing
+        
+        try {
+            bill.setText("\n\t      Trisha's Coffee Shop \n");
+            bill.setText(bill.getText()+"\t          Commonwealth\n");
+            bill.setText(bill.getText()+"\t          Building 24 MRB\n");
+            bill.setText(bill.getText()+"\t          Commonwealth\n\n");
+            bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
+            bill.setText(bill.getText()+"Items:                                        Qty:                      Price:             \n");
+            bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
+            
+        DefaultTableModel df = (DefaultTableModel) jTable3.getModel();
+        
+        //get table product details
+        for (int i = 0; i < jTable3.getRowCount(); i++) {
+            String Name = df.getValueAt(i, 1).toString();
+            String Qty = df.getValueAt(i, 2).toString();
+            String Price = df.getValueAt(i, 3).toString();
+            
+            bill.setText(bill.getText() + Name+"\t\t"+ Qty+"\t"+ Price +"\n");
+        }
+        // Display payment details
+        bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
+        bill.setText(bill.getText() + "Payment Details:\n");
+        bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
+        bill.setText(bill.getText() + "Cash: ₱" + pay.getText() + "\n");
+        bill.setText(bill.getText() + "Total: ₱" + total.getText() + "\n");
+        bill.setText(bill.getText() + "Change: ₱" + bal.getText() + "\n");
+        bill.setText(bill.getText() + "Date: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"\tTHANK YOU FOR COMING!");
+        
+        } catch (Exception e) {
+           
+        }          
+    }//GEN-LAST:event_paybuttonActionPerformed
 
     private void jTable3AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_jTable3AncestorAdded
         // TODO add your handling code here:
@@ -914,6 +993,8 @@ public class NewJFrame extends javax.swing.JFrame {
             // For example:
             insertOrderTransaction(new Date(), totalAmount);
             
+            // Display success message
+            JOptionPane.showMessageDialog(null, "Your order is successfully processed", "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (NumberFormatException e) {
             // Handle the case where the total text is not a valid double
             JOptionPane.showMessageDialog(null, "Invalid total amount", "Error", JOptionPane.ERROR_MESSAGE);
@@ -923,16 +1004,15 @@ public class NewJFrame extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Total amount is empty", "Error", JOptionPane.ERROR_MESSAGE);
     }
     
-        // Perform your current operations
-        // Perform your current operations
-        // Assuming you have variables `orderDate` and `totalAmount` defined elsewhere
-        // You need to set these variables with the appropriate values before calling insertOrderTransaction
-        Date orderDate = new Date(); // Example: current date and time
-        double totalAmount = Double.parseDouble(total.getText()); // Example: total amount from your GUI
-        
-        //Insert the order transaction into the database
-        //insertOrderTransaction(orderDate, totalAmount);
-        clearTable();
+    // Perform your current operations
+    // Assuming you have variables `orderDate` and `totalAmount` defined elsewhere
+    // You need to set these variables with the appropriate values before calling insertOrderTransaction
+    Date orderDate = new Date(); // Example: current date and time
+    double totalAmount = Double.parseDouble(total.getText()); // Example: total amount from your GUI
+    
+    //Insert the order transaction into the database
+    //insertOrderTransaction(orderDate, totalAmount);
+    clearTable();
     }//GEN-LAST:event_addbuttonActionPerformed
 
     private void updateBillPrinting() {
@@ -947,6 +1027,7 @@ public class NewJFrame extends javax.swing.JFrame {
         bill.append("\t          Commonwealth\n\n");
         bill.append("---------------------------------------------------------------------------------\n");
         bill.append("Items:                                        Qty:                      Price:             \n");
+        bill.append("---------------------------------------------------------------------------------\n");
 
         // Get table product details
         DefaultTableModel df = (DefaultTableModel) jTable3.getModel();
@@ -959,7 +1040,9 @@ public class NewJFrame extends javax.swing.JFrame {
         }
 
         // Add cash, total, change, and date
-        bill.append("---------------------------------------------------------------------------------\n");
+        bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
+        bill.setText(bill.getText() + "Payment Details:\n");
+        bill.setText(bill.getText()+"---------------------------------------------------------------------------------\n");
         bill.append("Cash: " + pay.getText() + "\n");
         bill.append("Total: " + total.getText() + "\n");
         bill.append("Change: " + bal.getText() + "\n");
@@ -967,6 +1050,11 @@ public class NewJFrame extends javax.swing.JFrame {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date currentDate = new Date();
         bill.append("Date: " + dateFormat.format(currentDate) + "\n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"                                                                                                       \n");
+        bill.setText(bill.getText()+"\tTHANK YOU FOR COMING!");
 
     } catch (Exception e) {
         JOptionPane.showMessageDialog(null, "Error updating bill printing", "Update Error", JOptionPane.ERROR_MESSAGE);
@@ -996,11 +1084,99 @@ public class NewJFrame extends javax.swing.JFrame {
         updateBalance();
     }//GEN-LAST:event_updatebuttonActionPerformed
 
-    private void transactiontableAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_transactiontableAncestorAdded
+    private void addcrudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addcrudActionPerformed
+    String orderDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    double totalAmount = Double.parseDouble(JOptionPane.showInputDialog(this, "Enter Total Amount:"));
+
+    String sql = "INSERT INTO orders (order_date, total_amount) VALUES (?, ?)";
+
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*");
+         PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        pstmt.setString(1, orderDate);
+        pstmt.setDouble(2, totalAmount);
+        
+        pstmt.executeUpdate();
+        
+        // Get the generated order_id
+        try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                int orderId = generatedKeys.getInt(1);
+                ((DefaultTableModel) crudtable.getModel()).addRow(new Object[]{orderId, orderDate, totalAmount});
+            }
+        }
+        JOptionPane.showMessageDialog(this, "Order added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error adding data", "Error", JOptionPane.ERROR_MESSAGE);
+    }// TODO add your handling code here:
+    }//GEN-LAST:event_addcrudActionPerformed
+
+    private void editcrudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editcrudActionPerformed
+        int selectedRow = crudtable.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a row to update", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    int orderId = (int) crudtable.getValueAt(selectedRow, 0);
+    String orderDate = crudtable.getValueAt(selectedRow, 1).toString();
+    double totalAmount = Double.parseDouble(JOptionPane.showInputDialog(this, "Enter Total Amount:", crudtable.getValueAt(selectedRow, 2)));
+
+    String sql = "UPDATE orders SET order_date = ?, total_amount = ? WHERE order_id = ?";
+
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*");
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setString(1, orderDate);
+        pstmt.setDouble(2, totalAmount);
+        pstmt.setInt(3, orderId);
+        
+        pstmt.executeUpdate();
+        ((DefaultTableModel) crudtable.getModel()).setValueAt(totalAmount, selectedRow, 2);
+        JOptionPane.showMessageDialog(this, "Order updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error updating data", "Error", JOptionPane.ERROR_MESSAGE);
+    }// TODO add your handling code here:
+    }//GEN-LAST:event_editcrudActionPerformed
+
+    private void deletecrudActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletecrudActionPerformed
+        int selectedRow = crudtable.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a row to delete", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    int orderId = (int) crudtable.getValueAt(selectedRow, 0);
+
+    String sql = "DELETE FROM orders WHERE order_id = ?";
+
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*");
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setInt(1, orderId);
+        
+        pstmt.executeUpdate();
+        ((DefaultTableModel) crudtable.getModel()).removeRow(selectedRow);
+        JOptionPane.showMessageDialog(this, "Order deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error deleting data", "Error", JOptionPane.ERROR_MESSAGE);
+    }// TODO add your handling code here:
+    }//GEN-LAST:event_deletecrudActionPerformed
+
+    private void searchbuttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchbuttonActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_transactiontableAncestorAdded
+    }//GEN-LAST:event_searchbuttonActionPerformed
 
   
+    private void filterTable(String searchText) {
+    DefaultTableModel model = (DefaultTableModel) crudtable.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    crudtable.setRowSorter(sorter);
+    sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText)); // Case-insensitive search
+}
     /**
      * @param args the command line arguments
      */
@@ -1035,13 +1211,51 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
     }
+    
+    private void searchInDatabase(String searchText) {
+    // Connect to the database
+    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/coffeeshoppos", "Trisha Delantar", "@Lalay22011139*")) {
+        // Construct the SQL query
+        String sql = "SELECT * FROM orders WHERE order_id = ?";
+
+        // Create a PreparedStatement
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            // Set the search parameter
+            statement.setString(1, searchText);
+
+            // Execute the query
+            try (ResultSet resultSet = statement.executeQuery()) {
+                // Process the results and update the table or display the data
+                // For example, you can update a JTable with the retrieved data
+                DefaultTableModel model = (DefaultTableModel) crudtable.getModel();
+                model.setRowCount(0); // Clear existing rows
+
+                while (resultSet.next()) {
+                    // Retrieve data from the result set and add it to the table
+                    int orderId = resultSet.getInt("order_id");
+                    Date orderDate = resultSet.getDate("order_date");
+                    double totalAmount = resultSet.getDouble("total_amount");
+
+                    model.addRow(new Object[]{orderId, orderDate, totalAmount});
+                }
+            }
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        // Handle any SQL exceptions
+    }
+}
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addbutton;
+    private javax.swing.JButton addcrud;
     private javax.swing.JLabel bal;
     private javax.swing.JTextArea bill;
+    private javax.swing.JTable crudtable;
     private javax.swing.JButton deletebutton;
+    private javax.swing.JButton deletecrud;
+    private javax.swing.JButton editcrud;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -1050,6 +1264,7 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1059,10 +1274,11 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTable jTable3;
     private javax.swing.JTextField pay;
+    private javax.swing.JButton paybutton;
     private javax.swing.JButton print;
     private javax.swing.JLabel q1;
     private javax.swing.JLabel q2;
@@ -1073,8 +1289,9 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel q7;
     private javax.swing.JLabel q8;
     private javax.swing.JLabel q9;
+    private javax.swing.JTextField searchbar;
+    private javax.swing.JButton searchbutton;
     private javax.swing.JLabel total;
-    private javax.swing.JTable transactiontable;
     private javax.swing.JButton updatebutton;
     // End of variables declaration//GEN-END:variables
 
